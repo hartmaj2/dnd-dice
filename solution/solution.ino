@@ -20,6 +20,10 @@ enum Program_state {CONFIG,IDLE,GENERATING};
 constexpr int dice_types[] = {4,6,8,10,12,20,100};
 constexpr int dice_types_length = sizeof(dice_types) / sizeof(dice_types[0]);
 
+constexpr int roll_button_index = 0;
+constexpr int amount_button_index = 1;
+constexpr int type_button_index = 2;
+
 constexpr Program_state start_state = CONFIG;
 
 // GLOBAL VARIABLES
@@ -460,9 +464,9 @@ Dice dice;
 
 void init_buttons()
 {
-  roll_button.init(0);
-  amount_button.init(1);
-  type_button.init(2);
+  roll_button.init(roll_button_index);
+  amount_button.init(amount_button_index);
+  type_button.init(type_button_index);
 }
 
 void init_display(unsigned long time_now, Dice dice)
