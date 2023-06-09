@@ -127,12 +127,17 @@ class Dice
       return current_dice_amount;
     }
 
+    void reset_roll_memory()
+    {
+      last_roll = start_roll_value;
+    }
+
     /*
      * Returns true if we havent rolled so far
      */
-    bool is_first_roll()
+    bool has_roll_in_memory()
     {
-      return last_roll == start_roll_value;
+      return last_roll != start_roll_value;
     }
 
     int get_last_roll()
@@ -508,7 +513,7 @@ void loop()
     case IDLE :
 
       // IDLE -> GENERATING
-      if (roll_signal == PRESSED || dice.is_first_roll())
+      if (roll_signal == PRESSED || !dice.has_roll_in_memory())
       {
         dice.start_roll(time_now);
         disp.prepare_animation(time_now);
@@ -529,6 +534,7 @@ void loop()
       // change dice type
       if (type_signal == PRESSED)
       {
+        dice.reset_roll_memory();
         dice.next_dice_type();
         disp.write_config_string(dice.get_dice_amount(), dice.get_dice_type());
       }
@@ -536,6 +542,7 @@ void loop()
       // change dice amount
       if (amount_signal == PRESSED)
       {
+        dice.reset_roll_memory();
         dice.next_dice_amount();
         disp.write_config_string(dice.get_dice_amount(), dice.get_dice_type());
       }
