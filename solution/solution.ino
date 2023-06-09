@@ -422,7 +422,7 @@ class Display
       output_animation_frame();
     }
 
-    void multiplex(unsigned long time_now)
+    void multiplex_characters(unsigned long time_now)
     {
       update_active_index(time_now);
       output_char(display_buffer[current_active_index],current_active_index);
@@ -500,6 +500,21 @@ void init_display(unsigned long time_now, Dice dice)
   
 }
 
+/*
+ * Multiplexing behaves differently in the GENERATING mode which is reserved for the animation
+ */
+void multiplex_display(unsigned long time_now)
+{
+  if (current_state == GENERATING)
+  {
+    disp.multiplex_animation(time_now,dice.get_max_digits_amount());
+  }
+  else
+  {
+    disp.multiplex_characters(time_now);
+  }
+}
+
 void setup() 
 {
 
@@ -537,7 +552,7 @@ void loop()
         current_state = GENERATING;
         dice.start_roll(time_now);
         disp.prepare_animation(time_now);
-        disp.next_animation();      
+        disp.next_animation();
       }
 
       // IDLE -> CONFIG
@@ -594,17 +609,6 @@ void loop()
 
   }
 
-  /*
-   * Multiplexing behaves differently in the GENERATING mode which is reserved for the animation
-   */
-  if (current_state == GENERATING)
-  {
-    disp.multiplex_animation(time_now,dice.get_max_digits_amount());
-  }
-  else
-  {
-    disp.multiplex(time_now);
-  }
-  
+  multiplex_display(time_now);
   
 }
