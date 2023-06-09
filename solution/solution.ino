@@ -31,6 +31,7 @@ class Dice
     static constexpr int max_dice_amount = 9;
     static constexpr int start_dice_type_index = 1;
     static constexpr int start_dice_amount = 1;
+    static constexpr int clear_memory_value = -1;
     
     unsigned long roll_start_time;
 
@@ -38,7 +39,6 @@ class Dice
     int current_dice_amount;
     int current_type_index;
 
-    int start_roll_value;
     int last_roll;
 
     int get_dice_sum()
@@ -60,13 +60,12 @@ class Dice
     }
 
   public:
-    void init(int start_number)
+    void init()
     {
       roll_start_time = 0;
       current_type_index = start_dice_type_index;
       current_dice_amount = start_dice_amount;
-      last_roll = start_number;
-      start_roll_value = start_number;
+      last_roll = clear_memory_value;
     }
 
     /*
@@ -129,7 +128,7 @@ class Dice
 
     void reset_roll_memory()
     {
-      last_roll = start_roll_value;
+      last_roll = clear_memory_value;
     }
 
     /*
@@ -137,7 +136,7 @@ class Dice
      */
     bool has_roll_in_memory()
     {
-      return last_roll != start_roll_value;
+      return last_roll != clear_memory_value;
     }
 
     int get_last_roll()
@@ -260,7 +259,6 @@ class Display
     static constexpr byte animation_end_frame = 0x04;
 
     // display parameters
-    static constexpr int display_start_number = 0;
     static constexpr int display_digits = 4;
     static constexpr int dice_type_digits = 2; // amount of reserved digits for the dice type when in config mode
     static constexpr int dice_amount_digits = 1; // same as above but for dice amount
@@ -443,10 +441,6 @@ class Display
       return false;
     }
 
-    int get_start_number()
-    {
-      return display_start_number;
-    }
 };
 
 Button roll_button;
@@ -473,7 +467,7 @@ void init_display(unsigned long time_now, Program_state start_state, Dice dice)
 
   if (start_state == IDLE)
   {
-    disp.write_number(disp.get_start_number());
+    disp.write_number(-1);
   }
   else if (start_state == CONFIG)
   {
@@ -492,7 +486,7 @@ void setup()
   
   init_buttons();
 
-  dice.init(disp.get_start_number());
+  dice.init();
   
   init_display(time_now, start_state, dice);
 
