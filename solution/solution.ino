@@ -6,11 +6,11 @@
  * 2. RELEASED - the button was just released and will be up and returning `NOTHING` until we press it again and get the `PRESSED` signal
  * 3. NOTHING - the button is currently up until we press it, when that happens, it returns the `PRESSED` signal
  */
-enum Button_signal {RELEASED,PRESSED,NOTHING};
+enum Button_signal {PRESSED,RELEASED,NOTHING};
 
 /*
  *  The program can be in these states:
- *  1. CONFIG - allows you to choose the type and amounts of dice, when going from CONFIG to IDLE, we can see the last result (which was saved)
+ *  1. CONFIG - allows you to choose the type and amounts of dice, when going from `CONFIG` to `IDLE`, we can see the last result (which was saved)
  *  2. IDLE - shows your last rolled number
  *  3. GENERATING - the roll button is held and the program is making a rolling animation (different possible results appear in sequence)
  */
@@ -29,13 +29,16 @@ constexpr Program_state start_state = CONFIG;
 // GLOBAL VARIABLES
 Program_state current_state;
 
+/*
+ * Takes care of the dice logic (switching dice amount/type, generating randomness etc.)
+ */
 class Dice
 {
   private:
     static constexpr int max_dice_amount = 9;
     static constexpr int start_dice_type_index = 1;
     static constexpr int start_dice_amount = 1;
-    static constexpr int clear_memory_value = -1;
+    static constexpr int clear_memory_value = -1; // indicates that we have nothing saved in the roll memory
     
     unsigned long roll_start_time;
 
@@ -43,7 +46,7 @@ class Dice
     int current_dice_amount;
     int current_type_index;
 
-    int last_roll;
+    int last_roll; // holds the result of last roll made 
 
     bool is_first_roll;
 
@@ -84,7 +87,7 @@ class Dice
     }
 
     /*
-     * This method used to take the hold time of the button into account but was switched to a simple version
+     * This method takes the hold time of the button during first roll into account to generate random seed
      */
     int finish_roll(unsigned long time_now)
     {
@@ -111,6 +114,9 @@ class Dice
       return dice_types[current_type_index];
     }
 
+    /*
+     * Used for animation purposes, the animation size depends on how much we may possibly roll
+     */
     int get_max_digits_amount()
     {
       int max_dice_value = dice_types[current_type_index] * current_dice_amount;
@@ -139,6 +145,9 @@ class Dice
       return current_dice_amount;
     }
 
+    /*
+     * Resets roll memory after changing dice configuration so we can roll right away after pressing the roll button
+     */
     void reset_roll_memory()
     {
       last_roll = clear_memory_value;
@@ -159,6 +168,9 @@ class Dice
 
 };
 
+/*
+ * Provides a way for the buttons to communicate with the main loop using `PRESSED`, `RELEASED` and `NOTHING` return signals
+ */
 class Button 
 {
 
@@ -425,6 +437,9 @@ class Display
       
     }
 
+    /*
+     * Writes the dice configuration string into the display buffer (and clears leftover characters in the buffer)
+     */
     void write_config_string(int amount, int type)
     {
       int index = display_digits - 1;
@@ -445,6 +460,9 @@ class Display
       animation_timer.reset_last_event_time(time_now);
     }
 
+    /*
+     * Returns true if we should move to next animation frame
+     */
     bool should_animate(unsigned long time_now)
     {
       if (animation_timer.should_signal(time_now))
