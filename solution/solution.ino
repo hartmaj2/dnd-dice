@@ -140,22 +140,6 @@ class Dice
       return last_roll;
     }
 
-    /*
-     * Makes a roll for the purpose of animation, when we get the same roll, we want to change it to a different one
-     * so the animation seems to be doing something
-     */
-    // int animation_roll()
-    // {
-    //   int new_roll = last_roll;
-    //   while (last_roll == new_roll)
-    //   {
-    //     refresh_all_dice();
-    //     new_roll = get_dice_sum();
-    //   }
-    //   last_roll = new_roll;
-    //   return last_roll;
-    // }
-
 };
 
 class Button 
