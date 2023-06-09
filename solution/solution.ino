@@ -41,6 +41,8 @@ class Dice
 
     int last_roll;
 
+    bool is_first_roll;
+
     int get_dice_sum()
     {
       int sum = 0;
@@ -66,6 +68,7 @@ class Dice
       current_type_index = start_dice_type_index;
       current_dice_amount = start_dice_amount;
       last_roll = clear_memory_value;
+      is_first_roll = true;
     }
 
     /*
@@ -79,8 +82,14 @@ class Dice
     /*
      * This method used to take the hold time of the button into account but was switched to a simple version
      */
-    int finish_roll()
+    int finish_roll(unsigned long time_now)
     {
+      if (is_first_roll)
+      {
+        is_first_roll = false;
+        unsigned long diff = time_now - roll_start_time;
+        randomSeed(diff + time_now);
+      }
       refresh_all_dice();
       last_roll = get_dice_sum();
       return last_roll;
@@ -548,7 +557,7 @@ void loop()
       // GENERATING -> IDLE
       if (roll_signal == RELEASED)
       {
-        disp.write_number(dice.finish_roll());
+        disp.write_number(dice.finish_roll(time_now));
         current_state = IDLE;
       }
 
