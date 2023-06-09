@@ -396,7 +396,7 @@ class Display
     }
 
     /*
-     * The animation is only done at digits that the maximum possible dice throw for the current configuration will occupy 
+     * The animation is only done at digits that the maximum possible dice throw for the current configuration may occupy 
      */
     void multiplex_animation(unsigned long time_now, int max_digits_amount)
     {
@@ -516,17 +516,17 @@ void loop()
       // IDLE -> GENERATING
       if (roll_signal == PRESSED || !dice.has_roll_in_memory())
       {
+        current_state = GENERATING;
         dice.start_roll(time_now);
         disp.prepare_animation(time_now);
-        disp.next_animation();
-        current_state = GENERATING; 
+        disp.next_animation();      
       }
 
       // IDLE -> CONFIG
       if (type_signal == PRESSED || amount_signal == PRESSED)
       {
-        disp.write_config_string(dice.get_dice_amount(), dice.get_dice_type());
-        current_state = CONFIG; 
+        current_state = CONFIG;
+        disp.write_config_string(dice.get_dice_amount(), dice.get_dice_type());   
       }
     break;
 
@@ -551,8 +551,8 @@ void loop()
       // CONFIG -> IDLE (shows the last roll result)
       if (roll_signal == PRESSED)
       {
-        disp.write_number(dice.get_last_roll());
         current_state = IDLE;
+        disp.write_number(dice.get_last_roll());
       }
     break;
 
@@ -561,8 +561,8 @@ void loop()
       // GENERATING -> IDLE
       if (roll_signal == RELEASED)
       {
-        disp.write_number(dice.finish_roll(time_now));
         current_state = IDLE;
+        disp.write_number(dice.finish_roll(time_now));
       }
 
       // we are currently generating the roll
@@ -581,7 +581,7 @@ void loop()
    */
   if (current_state == GENERATING)
   {
-  disp.multiplex_animation(time_now,dice.get_max_digits_amount());
+    disp.multiplex_animation(time_now,dice.get_max_digits_amount());
   }
   else
   {
