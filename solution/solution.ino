@@ -456,7 +456,7 @@ void init_buttons()
   type_button.init(2);
 }
 
-void init_display(unsigned long time_now, Program_state start_state, Dice dice)
+void init_display(unsigned long time_now, Dice dice)
 {
 
   pinMode(latch_pin, OUTPUT);
@@ -465,14 +465,8 @@ void init_display(unsigned long time_now, Program_state start_state, Dice dice)
 
   disp.init(time_now);
 
-  if (start_state == IDLE)
-  {
-    disp.write_number(-1);
-  }
-  else if (start_state == CONFIG)
-  {
-    disp.write_config_string(dice.get_dice_amount(), dice.get_dice_type());
-  }
+  disp.write_config_string(dice.get_dice_amount(), dice.get_dice_type());
+  
 }
 
 void setup() 
@@ -488,7 +482,7 @@ void setup()
 
   dice.init();
   
-  init_display(time_now, start_state, dice);
+  init_display(time_now, dice);
 
 }
 
